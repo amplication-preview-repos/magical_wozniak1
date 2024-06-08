@@ -1,0 +1,57 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model File {
+  createdAt  DateTime  @default(now())
+  filename   String?
+  fileType   String?
+  fileUrl    String?
+  id         String    @id @default(cuid())
+  links      Link[]
+  updatedAt  DateTime  @updatedAt
+  uploadedAt DateTime?
+  user       User?     @relation(fields: [userId], references: [id])
+  userId     String?
+}
+
+model Link {
+  createdAt  DateTime  @default(now())
+  expiryDate DateTime?
+  file       File?     @relation(fields: [fileId], references: [id])
+  fileId     String?
+  id         String    @id @default(cuid())
+  isActive   Boolean?
+  linkUrl    String?
+  updatedAt  DateTime  @updatedAt
+}
+
+model Profile {
+  bio            String?
+  createdAt      DateTime @default(now())
+  displayName    String?
+  id             String   @id @default(cuid())
+  profilePicture Json?
+  updatedAt      DateTime @updatedAt
+  user           User?    @relation(fields: [userId], references: [id])
+  userId         String?
+}
+
+model User {
+  createdAt DateTime  @default(now())
+  email     String?   @unique
+  files     File[]
+  firstName String?
+  id        String    @id @default(cuid())
+  lastName  String?
+  password  String
+  profiles  Profile[]
+  roles     Json
+  updatedAt DateTime  @updatedAt
+  username  String    @unique
+}
